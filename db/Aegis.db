@@ -1,0 +1,7 @@
+CREATE TABLE Aegis (
+    id    varchar(20) PRIMARY KEY,
+    name  varchar(30) NOT NULL,
+    namespace varchar(30) NOT NULL
+);
+
+INSERT INTO Aegis (Id, Name, Namespace) values ("test", "test", "test")
