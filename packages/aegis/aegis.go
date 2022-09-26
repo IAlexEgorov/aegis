@@ -2,10 +2,11 @@ package aegis
 
 import (
 	"database/sql"
-	"encoding/json"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	log "k8s/packages/logging"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -18,50 +19,32 @@ type Aegis struct {
 	// Components []string {"mlfow", "airflow"} // без селдона - только батч
 }
 
-type PostgresConnection struct {
-	User     string
-	Password string
-	Dbname   string
-	Sslmode  string
+func (a Aegis) CreateProject(dbCon *sql.DB) {
+	var db *sql.DB = dbCon
+	a.InsertRow(db)
 }
 
-func (pc *PostgresConnection) Parse(data string) string {
-	err := json.Unmarshal([]byte(data), &pc)
+func (a Aegis) ConnectToDB(user, password, dbname string, port uint16) (db *sql.DB) {
+	//"root:root@tcp(127.0.0.1:8889)/mysql"
+	db, err := sql.Open("mysql", user+":"+password+"@tcp(127.0.0.1:"+strconv.Itoa(int(port))+")/"+dbname)
 	if err != nil {
-		log.ErrorLogger.Println(err)
+		panic(err)
 	}
-	return "user=" + pc.User + " password=" + pc.Password +
-		" dbname=" + pc.Dbname + " sslmode=" + pc.Sslmode
-}
-
-func (a Aegis) CreateProject() {
-	var db *sql.DB = a.ConnectToDB()
-	a.InsertRow(db, a.Id, a.Name, a.Namespace)
-}
-
-func (a Aegis) ConnectToDB() (db *sql.DB) {
-	defer func(db *sql.DB) {
-		err := db.Close()
-		if err != nil {
-			log.ErrorLogger.Println(err)
-		}
-	}(db)
-
-	var pc PostgresConnection = PostgresConnection{}
-	db, err := sql.Open("postgres", pc.Parse(loginPostgres))
-	if err != nil {
-		log.ErrorLogger.Println(err)
-	}
+	log.InfoLogger.Println("DB Connected")
 	return
 }
 
-func (a Aegis) InsertRow(db *sql.DB, id, name, ns string) {
-	_, err := db.Exec("insert into Aegis (Name, Namespace) values ($1, $2)", name, ns)
+func (a Aegis) InsertRow(db *sql.DB) {
+	parsQ := "INSERT INTO `Aegis`(`Id`, `Name`, `Namespace`) VALUES ('" + a.Id + "','" + a.Name + "','" + a.Namespace + "')"
+	insert, err := db.Query(parsQ)
 	if err != nil {
 		log.ErrorLogger.Println(err)
+		panic(err)
 	}
-	log.InfoLogger.Println("INSERT INTO Aegis", name, ns)
-	a.HelmCreate(name, ns)
+	log.InfoLogger.Println("Query was created")
+	defer insert.Close()
+
+	//a.HelmCreate(name, ns)
 }
 
 func (a Aegis) HelmCreate(name, ns string) {

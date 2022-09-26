@@ -2,3 +2,11 @@ ERROR: 2022/09/24 01:26:49 aegis.go:31: invalid character 'D' looking for beginn
 ERROR: 2022/09/24 01:27:08 aegis.go:31: invalid character 'D' looking for beginning of object key string
 ERROR: 2022/09/24 01:29:46 aegis.go:31: invalid character 'D' looking for beginning of object key string
 ERROR: 2022/09/24 01:31:53 aegis.go:31: invalid character 'D' looking for beginning of object key string
+INFO: 2022/09/26 14:32:41 aegis.go:33: DB Connected
+INFO: 2022/09/26 15:00:33 aegis.go:33: DB Connected
+INFO: 2022/09/26 15:03:18 aegis.go:33: DB Connected
+INFO: 2022/09/26 15:08:30 aegis.go:33: DB Connected
+ERROR: 2022/09/26 15:08:30 aegis.go:41: Error 1062: Duplicate entry 'test1' for key 'PRIMARY'
+INFO: 2022/09/26 15:08:30 aegis.go:43: Query was created
+INFO: 2022/09/26 15:09:03 aegis.go:33: DB Connected
+ERROR: 2022/09/26 15:09:03 aegis.go:41: Error 1062: Duplicate entry 'test1' for key 'PRIMARY'
